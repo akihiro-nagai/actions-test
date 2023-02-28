@@ -23,7 +23,7 @@ jobs:
       - name: test-step
         shell: bash
         run: |
-          echo 'hello'
+          echo 'hello otameshi'
           ls -la
           env
           git log
