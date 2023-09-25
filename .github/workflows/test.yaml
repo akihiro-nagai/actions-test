@@ -1,9 +1,6 @@
 name: Otameshi-GHA
 
 on:
-  push:
-    branches:
-      - main
   #schedule:
   #  - cron: '0/5 * * * *'
   workflow_dispatch:
@@ -13,12 +10,34 @@ on:
         default: false
         required: false
         type: boolean
+  push:
+    tags:
+      - v*
+  #workflow_run:
+  #  workflows: ["Otameshi-trigger"]
+  #  types: ["completed"]
+  workflow_call:
+    inputs:
+      newtag:
+        description: '新しいタグ'
+        required: true
+        type: string
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: get-revision
+        shell: bash
+        run: |
+          echo "newtag=${newtag}"
+          env
+        env:
+          newtag: ${{ inputs.newtag }}
+
       - uses: actions/checkout@v3
+        with:
+          ref: ""
 
       - name: test-step
         shell: bash
