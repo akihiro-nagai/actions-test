@@ -1,0 +1,29 @@
+name: Otameshi-trigger
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  checks: write
+  contents: write
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: trigger
+        shell: bash
+        run: |
+          set -x
+          echo ${gh_token:0:4}
+          git remote add target "https://akihiro-nagai:${gh_token}@github.com/akihiro-nagai/actions-test.git"
+          git remote -v
+          git remote update target
+          ver=v$(date '+%Y.%m.%d-%H%M%S')
+          git tag "${ver}"
+          git push target "${ver}"
+        env:
+          gh_token: ${{ secrets.GH_TOKEN }}
