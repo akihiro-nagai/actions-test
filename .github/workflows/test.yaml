@@ -1,9 +1,6 @@
 name: Otameshi-GHA
 
 on:
-  push:
-    branches:
-      - main
   #schedule:
   #  - cron: '0/5 * * * *'
   workflow_dispatch:
@@ -13,6 +10,9 @@ on:
         default: false
         required: false
         type: boolean
+  push:
+    tags:
+      - v*
 
 jobs:
   test:
