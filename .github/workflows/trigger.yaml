@@ -1,0 +1,18 @@
+name: Otameshi-trigger
+
+on:
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: trigger
+        shell: bash
+        run: |
+          git remote add target 'https://github.com/akihiro-nagai/actions-test.git'
+          ver=v$(date '+%Y.%m.%d-%H%S%M')
+          git tag "${ver}"
+          git push target "${ver}"
