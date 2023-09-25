@@ -1,0 +1,65 @@
+name: Otameshi-trigger
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  checks: write
+  contents: write
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - id: create_token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.GH_APP_ID }}
+          private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0' # all-history
+
+      - id: trigger
+        name: trigger
+        shell: bash
+        run: |
+          set -ux
+          #echo ${GITHUB_TOKEN:0:6}
+          #echo ${GITHUB_TOKEN} | md5sum
+          #git remote add target "https://akihiro-nagai:${GITHUB_TOKEN}@github.com/akihiro-nagai/actions-test.git"
+          git remote -v
+          #git remote update target
+          ver=v$(date '+%Y.%m.%d-%H%M%S')
+          git tag "${ver}"
+          #git push target "${ver}"
+          git push origin "${ver}"
+          echo "newtag=${ver}" >> "${GITHUB_OUTPUT}"
+        env:
+          GITHUB_TOKEN: ${{ steps.create_token.outputs.token }}
+        #  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: git-checkout-test
+        shell: bash
+        run: |
+          set -x
+          git log -n1
+          git checkout d50a680f863d9aa1dd2400d04ea9e
+          git log -n1
+
+      - name: git-checkout-test2
+        shell: bash
+        run: |
+          set -x
+          git log -n1
+
+    outputs:
+      newtag: ${{ steps.trigger.outputs.newtag }}
+
+#  call-main:
+#    needs: trigger
+#    uses: ./.github/workflows/test.yaml
+#    with:
+#      newtag: ${{ needs.trigger.outputs.newtag }}
